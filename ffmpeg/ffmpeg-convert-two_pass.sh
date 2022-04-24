@@ -88,5 +88,5 @@ DIRECTORY="${1}"
 		-filter:a "volume=30dB" \
 		-filter:v fps=fps=${FRAMES} \
 		\
-		"${filename}-${RESOLUTION}-${SIZE_MB}-r${FRAMES}.mp4"
+		"${filename}-${RESOLUTION}-size${SIZE_MB}-fps${FRAMES}.mp4"
 done
