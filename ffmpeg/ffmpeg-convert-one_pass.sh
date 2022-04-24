@@ -9,9 +9,9 @@ set -o pipefail
 ###
 ### ffmpeg definitions
 ###
-CRF=23          # End file size in MB
+CRF=22          # Video quality
 AUDIO_KB=128    # Desired audio bitrate
-RESOLUTION=480  # Desired output resolution
+RESOLUTION=640  # Desired output resolution
 FRAMES=30       # Output frame rate
 PRESET=slow     # FFMPEG preset (ultrafast, superfast, veryfast, faster, fast, medium, slow, slower, veryslow)
 
@@ -33,16 +33,15 @@ fi
 ### Check command line arguments
 ###
 if [ "${#}" -ne "1" ]; then
-	>&2 echo "Error, you must specify a directory."
-	>&2 echo "Usage ${0} <dir>"
+	>&2 echo "Error, you must specify a file or directory."
+	>&2 echo "Usage ${0} <file/dir>"
 	exit 1
 fi
-if [ ! -d "${1}" ]; then
-	>&2 echo "Error, ${1} not a directory."
-	>&2 echo "Usage ${0} <dir>"
+if [ ! -f "${1}" ] && [ ! -d "${1}" ]; then
+	>&2 echo "Error, '${1}' is not a file or directory."
+	>&2 echo "Usage ${0} <file/dir>"
 	exit 1
 fi
-
 DIRECTORY="${1}"
 
 
@@ -56,17 +55,17 @@ DIRECTORY="${1}"
 
 	ffmpeg -nostdin -y \
 		-i "${filename}" \
-		-c:v libx265 \
 		-preset ${PRESET} \
-		-vf scale=${RESOLUTION}:-1 \
+		-movflags faststart \
+		\
+		-c:v libx265 \
 		-crf "${CRF}" \
 		\
 		-c:a aac \
 		-b:a ${AUDIO_KB}k \
 		\
-		-movflags faststart \
 		-filter:a "volume=30dB" \
-		-filter:v fps=fps=${FRAMES} \
+		-filter:v "scale=${RESOLUTION}:-2:flags=lanczos, fps=fps=${FRAMES}" \
 		\
 		"${filename}-${RESOLUTION}-crf${CRF}-fps${FRAMES}.mp4"
 done
