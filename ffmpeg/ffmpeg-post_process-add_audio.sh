@@ -6,6 +6,13 @@ set -o pipefail
 
 
 ###
+### How much volume of the audio track
+###
+VOLUME=0.2
+
+
+
+###
 ### Check required tools
 ###
 if ! command -v ffmpeg >/dev/null 2>&1; then
@@ -40,7 +47,7 @@ EXT="$( echo "${VIDEO}" | awk -F'.' '{print $NF}' )"
 ffmpeg -nostdin -y \
 	-i "${VIDEO}" \
 	-i "${AUDIO}" \
-	-filter_complex "[0:a]volume=1[a0];[1:a]volume=0.1[a1];[a0][a1]amerge=inputs=2[a]" \
+	-filter_complex "[0:a]volume=1[a0];[1:a]volume=${VOLUME}[a1];[a0][a1]amerge=inputs=2[a]" \
 	-map 0:v \
 	-map "[a]" \
 	-c:v copy \
